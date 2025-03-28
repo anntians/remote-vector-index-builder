@@ -3,6 +3,8 @@ from core.common.models import VectorsDataset
 from core.common.models import IndexBuildParameters
 import numpy as np
 import os
+import logging
+logger = logging.getLogger(__name__)
 
 def test_data():
 
@@ -10,7 +12,7 @@ def test_data():
     end = int(os.environ.get("END", 1000000))
 
     for i in range (start,end):
-        print(f"Running for doc count {i}")
+        logger.info(f"Running for doc count {i}")
         np_vecs = np.array([[float(j) + 1 for j in range(5)] for _ in range(i)], dtype=np.float32)
         np_docs = np.arange(0, i, dtype=np.int32)
 
@@ -28,8 +30,16 @@ def test_data():
             vectors_dataset=vectors_dataset,
             cpu_index_output_file_path=f"/remote_vector_index_builder/graph_files/graph_{i}.faiss"
         )
-        print(f"Built graph for vectors with doc count {i}")
+        logger.info(f"Built graph for vectors with doc count {i}")
 
+def configure_logging(log_level):
+    # Configure logging
+    logging.basicConfig(
+        level=log_level,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
 
 if __name__ == "__main__":
+    configure_logging("INFO")
     test_data()

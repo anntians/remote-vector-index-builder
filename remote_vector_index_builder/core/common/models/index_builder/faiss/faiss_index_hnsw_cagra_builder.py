@@ -13,7 +13,8 @@ from core.common.models import (
     FaissGpuBuildIndexOutput,
     FaissCPUIndexBuilder,
 )
-
+import logging
+logger = logging.getLogger(__name__)
 
 @dataclass
 class FaissIndexHNSWCagraBuilder(FaissCPUIndexBuilder):
@@ -79,7 +80,9 @@ class FaissIndexHNSWCagraBuilder(FaissCPUIndexBuilder):
 
             # Copy GPU index to CPU index
             gpu_index = faiss_gpu_build_index_output.gpu_index
+            logger.info("Before copyTo(cpu_index)")
             gpu_index.copyTo(cpu_index)
+            logger.info("After copyTo(cpu_index)")
 
             # Update the ID map index with the CPU index
             index_id_map = faiss_gpu_build_index_output.index_id_map

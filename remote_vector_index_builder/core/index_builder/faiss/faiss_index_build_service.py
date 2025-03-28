@@ -6,6 +6,9 @@
 # compatible open source license.
 
 import faiss
+import logging
+logger = logging.getLogger(__name__)
+
 from core.common.models import (
     IndexBuildParameters,
     VectorsDataset,
@@ -54,8 +57,12 @@ class FaissIndexBuildService(IndexBuildService):
         faiss_cpu_build_index_output = None
 
         try:
+            logger.info(f"faiss: {faiss.__version__}")
+            logger.info(f"faiss file: {faiss.__file__}")
             # Set number of threads for parallel processing
             faiss.omp_set_num_threads(self.omp_num_threads)
+
+            logger.info("[Start] Step 1a: Create a structured GPUIndexConfig")
 
             # Step 1a: Create a structured GPUIndexConfig having defaults,
             # from a partial dictionary set from index build params
@@ -71,6 +78,12 @@ class FaissIndexBuildService(IndexBuildService):
                 gpu_index_config_params
             )
 
+            logger.info(f"gpu_index_config_params: {gpu_index_config_params}")
+            logger.info(f"faiss_gpu_index_cagra_builder: {faiss_gpu_index_cagra_builder}")
+
+            logger.info("[Done] Step 1a")
+
+            logger.info("[Start] Step 1b: create a GPU Index")
             # Step 1b: create a GPU Index from the faiss config and vector dataset
             faiss_gpu_build_index_output = (
                 faiss_gpu_index_cagra_builder.build_gpu_index(
@@ -80,6 +93,13 @@ class FaissIndexBuildService(IndexBuildService):
                 )
             )
 
+            logger.info(f"vectors_dataset: {vectors_dataset}")
+            logger.info(f"index_build_parameters.dimension: {index_build_parameters.dimension}")
+            logger.info(f"index_build_parameters.index_parameters.space_type: {index_build_parameters.index_parameters.space_type}")
+
+            logger.info("[Done] Step 1b")
+
+            logger.info("[Start] Step 2a: Create a structured CPUIndexConfig")
             # Step 2a: Create a structured CPUIndexConfig having defaults,
             # from a partial dictionary set from index build params
             cpu_index_config_params = {
@@ -90,6 +110,12 @@ class FaissIndexBuildService(IndexBuildService):
                 cpu_index_config_params
             )
 
+            logger.info(f"faiss_index_hnsw_cagra_builder: {faiss_index_hnsw_cagra_builder}")
+            logger.info(f"cpu_index_config_params: {cpu_index_config_params}")
+
+            logger.info("[Done] Step 2a: Create a structured CPUIndexConfig")
+
+            logger.info("[Start] Step 2b: Convert GPU Index to CPU Index")
             # Step 2b: Convert GPU Index to CPU Index, update index to cpu index in index-id mappings
             # Also Delete GPU Index after conversion
             faiss_cpu_build_index_output = (
@@ -97,6 +123,8 @@ class FaissIndexBuildService(IndexBuildService):
                     faiss_gpu_build_index_output
                 )
             )
+
+            logger.info("[Done] Step 2b: Convert GPU Index to CPU Index")
 
             # Step 3: Write CPU Index to persistent storage
             faiss_index_hnsw_cagra_builder.write_cpu_index(
