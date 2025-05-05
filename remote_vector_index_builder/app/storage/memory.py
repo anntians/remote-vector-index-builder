@@ -129,6 +129,13 @@ class InMemoryRequestStore(RequestStore):
             bool: True if job was found and deleted successfully, False if job not found
         """
         with self._lock:
+            temp_store = {
+                job_id: data
+                for job_id, data in self._store.items()
+                if data[0].status == JobStatus.RUNNING
+            }
+            logger.info(f"Number of running jobs when CapacityError: {len(temp_store)}")
+            logger.info(f"Dump request store: {temp_store}")
             if job_id in self._store:
                 del self._store[job_id]
                 return True

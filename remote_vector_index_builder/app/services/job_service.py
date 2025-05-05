@@ -106,6 +106,7 @@ class JobService:
                 request_parameters=request_parameters,
             ),
         )
+        logger.info(f"request_store size: {len(self.request_store._store)}")
 
         if not result:
             raise CapacityError("Could not add item to request store")
@@ -137,6 +138,11 @@ class JobService:
             cpu_memory_required=cpu_mem,
             index_build_parameters=index_build_parameters,
         )
+
+        logger.info(f"workflow.gpu_memory_required: {workflow.gpu_memory_required}")
+        logger.info(f"workflow.cpu_memory_required: {workflow.cpu_memory_required}")
+        logger.info(f"_available_gpu_memory: {self.resource_manager._available_gpu_memory}")
+        logger.info(f"_available_cpu_memory: {self.resource_manager._available_cpu_memory}")
 
         # Allocate resources
         allocation_success = self.resource_manager.allocate(

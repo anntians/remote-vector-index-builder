@@ -6,6 +6,9 @@
 # compatible open source license.
 
 import threading
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ResourceManager:
@@ -70,6 +73,7 @@ class ResourceManager:
         with self._lock:
             self._available_gpu_memory += gpu_memory
             self._available_cpu_memory += cpu_memory
+            logger.info(f"Releasing gpu_memory: {gpu_memory}, cpu_memory: {cpu_memory}, _available_gpu_memory: {self._available_gpu_memory}, _available_cpu_memory: {self._available_cpu_memory}")
 
     def get_available_gpu_memory(self) -> float:
         """

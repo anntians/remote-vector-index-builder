@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     cpu_memory_limit: float = 32.0 * 10**9
 
     # Workflow Executor settings
-    max_workers: int = 5
+    max_workers: int = 2
 
     # Service settings
     service_name: str = "remote-vector-index-builder-api"
