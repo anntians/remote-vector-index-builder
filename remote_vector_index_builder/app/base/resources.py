@@ -6,6 +6,9 @@
 # compatible open source license.
 
 import threading
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ResourceManager:
@@ -50,6 +53,10 @@ class ResourceManager:
             bool: True if allocation was successful, False if insufficient resources
         """
         with self._lock:
+            logger.info(f"workflow.gpu_memory: {gpu_memory}")
+            logger.info(f"workflow.cpu_memory: {cpu_memory}")
+            logger.info(f"_available_gpu_memory: {self._available_gpu_memory}")
+            logger.info(f"_available_cpu_memory: {self._available_cpu_memory}")
             if not (
                 self._available_gpu_memory >= gpu_memory
                 and self._available_cpu_memory >= cpu_memory
@@ -70,6 +77,7 @@ class ResourceManager:
         with self._lock:
             self._available_gpu_memory += gpu_memory
             self._available_cpu_memory += cpu_memory
+            logger.info(f"Releasing gpu_memory: {gpu_memory}, cpu_memory: {cpu_memory}, _available_gpu_memory: {self._available_gpu_memory}, _available_cpu_memory: {self._available_cpu_memory}")
 
     def get_available_gpu_memory(self) -> float:
         """

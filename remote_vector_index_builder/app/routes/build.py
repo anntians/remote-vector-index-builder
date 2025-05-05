@@ -44,5 +44,6 @@ def create_job(
     except HashCollisionError as e:
         raise HTTPException(status_code=429, detail=str(e))
     except CapacityError as e:
+        logger.info(f"CapacityError {e}")
         raise HTTPException(status_code=507, detail=str(e))
     return CreateJobResponse(job_id=job_id)

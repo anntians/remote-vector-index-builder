@@ -138,16 +138,16 @@ class JobService:
             index_build_parameters=index_build_parameters,
         )
 
-        # Allocate resources
-        allocation_success = self.resource_manager.allocate(
-            workflow.gpu_memory_required, workflow.cpu_memory_required
-        )
-
-        if not allocation_success:
-            self.request_store.delete(job_id)
-            raise CapacityError(
-                f"Insufficient available resources to process job {job_id}"
-            )
+        # # Allocate resources
+        # allocation_success = self.resource_manager.allocate(
+        #     workflow.gpu_memory_required, workflow.cpu_memory_required
+        # )
+        #
+        # if not allocation_success:
+        #     self.request_store.delete(job_id)
+        #     raise CapacityError(
+        #         f"Insufficient available resources to process job {job_id}"
+        #     )
 
         return workflow
 
